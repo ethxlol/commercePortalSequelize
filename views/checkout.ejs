@@ -1,0 +1,19 @@
+<%- include('partials/header', { title: 'Checkout' }) %> <%-
+include('partials/navigation') %>
+
+<h1>Ferdigstill ordre</h1>
+<div id="checkout-cart-container"></div>
+<div id="cart-update-message" style="display: none">Cart updated!</div>
+<button onclick="submitOrder()">Send Ordre</button>
+<script>
+	fetch('/current-user')
+		.then((response) => response.json())
+		.then((data) => {
+			if (data.username) {
+				document.getElementById('currentUser').innerText += data.username;
+			}
+		})
+		.catch((error) => console.error('Error:', error));
+</script>
+
+<script src="/javascripts/checkout.js"></script>

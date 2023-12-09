@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
-</html>
+<%- include('partials/header', { title: 'Welcome to Refa Proff' }) %>
+
+<div class="centered-container">
+	<h1>Refa Proff</h1>
+	<p>Venligst Logg Inn eller Registrer bruker.</p>
+	<div class="auth-buttons">
+		<a href="/login" class="button">Logg inn</a>
+		<a href="/register" class="button">Registrer</a>
+	</div>
+</div>

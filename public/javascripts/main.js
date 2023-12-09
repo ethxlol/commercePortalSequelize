@@ -5,41 +5,38 @@ document.addEventListener('DOMContentLoaded', function () {
 			const productList = document.getElementById('product-list');
 			products.forEach((product) => {
 				const imageUrl = product.image_url || 'path/to/default/image.jpg'; // Fallback to default image if image_url is not present
+				const price = parseFloat(product.price);
+				const formattedPrice = isNaN(price) ? 'N/A' : price.toFixed(2); // Format price or set to 'N/A' if not a number
+
 				const productElement = document.createElement('div');
 				productElement.className = 'product';
 				productElement.innerHTML = `
-				<style>
-				.thumbnail {
-					width: 100px; /* Set your desired width */
-					height: auto; /* Maintain aspect ratio */
-					border: 1px solid #ddd; /* Optional: adds a light border around the image */
-					border-radius: 4px; /* Optional: rounds the corners of the image */
-					padding: 5px; /* Adds some spacing around the image */
-					margin-right: 10px; /* Increases spacing to the right of the image */
-					display: inline-block; /* This makes the image align with the text */
-					vertical-align: top; /* Aligns the image to the top of the text */
-					transition: transform 0.3s ease; /* Smooth transition for the transform */
-				}
-				
-				.thumbnail:hover {
-					transform: scale(2); /* Doubles the size of the image */
-					z-index: 10; /* Ensures the image is above other elements while scaling */
-				}
-				</style>
-				<img src="${imageUrl}" alt="${product.name}" class="thumbnail" />
-				<h3>${product.name}</h3>
-				<p>${product.description}</p>
-				<p>Price: $${product.price.toFixed(2)}</p>
-				<label for="quantity_${product.id}">Quantity:</label>
-				<input type="number" id="quantity_${product.id}" value="1" min="1">
-				<button onclick="handleAddToCart(${product.id})">Add to Cart</button>
-				`;
+									<style>
+											/* Your existing styles */
+									</style>
+									<img src="${imageUrl}" alt="${product.name}" class="thumbnail" />
+									<h3>${product.name}</h3>
+									<p>${product.description}</p>
+									<p>Price: $${formattedPrice}</p>
+									<label for="quantity_${product.id}">Quantity:</label>
+									<input type="number" id="quantity_${product.id}" value="1" min="1">
+									<button onclick="handleAddToCart(${product.id})">Add to Cart</button>
+							`;
 				productList.appendChild(productElement);
 				console.log(product); // Debug: Log the product object to see if image_url is present
 			});
 		})
 		.catch((error) => console.error('Error:', error));
 });
+
+function formatPrice(price) {
+	const parsedPrice = parseFloat(price);
+	if (!isNaN(parsedPrice)) {
+		return `<p>Price: $${parsedPrice.toFixed(2)}</p>`;
+	} else {
+		return '<p>Price: N/A</p>';
+	}
+}
 
 function showAddToCartMessage() {
 	const messageDiv = document.getElementById('add-to-cart-message');
@@ -89,18 +86,36 @@ function showCart() {
 				cartContainer.innerHTML = '<p>Your cart is empty.</p>';
 			} else {
 				cartItems.forEach((item) => {
-					const itemElement = document.createElement('div');
-					itemElement.className = 'cart-item';
-					itemElement.innerHTML = `
-											<p>${item.name} - $${item.price.toFixed(2)} x ${item.quantity}</p>
-									`;
-					cartContainer.appendChild(itemElement);
+					// Convert item.price to a number if it's not already
+					const price = parseFloat(item.price);
+
+					// Check if price is a valid number
+					if (!isNaN(price)) {
+						const itemElement = document.createElement('div');
+						itemElement.className = 'cart-item';
+						itemElement.innerHTML = `
+							<p>${item.name} - $${price.toFixed(2)} x ${item.quantity}</p>
+						`;
+						cartContainer.appendChild(itemElement);
+					} else {
+						console.error('Invalid price for item:', item);
+						// Optionally handle the error visually in the UI as well
+					}
 				});
 			}
 
 			cartContainer.style.display = 'block'; // Make the cart container visible
 		})
 		.catch((error) => console.error('Error:', error));
+}
+
+function formatPrice(price) {
+	const parsedPrice = parseFloat(price);
+	if (!isNaN(parsedPrice)) {
+		return `$${parsedPrice.toFixed(2)}`;
+	} else {
+		return 'N/A';
+	}
 }
 
 // Add this function if you want to update the displayed cart count
@@ -130,114 +145,5 @@ function handleCheckout() {
 		})
 		.catch((error) => {
 			console.error('Error:', error);
-		});
-}
-
-// checkout.js
-
-document.addEventListener('DOMContentLoaded', function () {
-	updateCheckoutCart();
-});
-
-function updateCheckoutCart() {
-	fetch('/cart-details')
-		.then((response) => response.json())
-		.then((cartItems) => {
-			const checkoutCartContainer = document.getElementById(
-				'checkout-cart-container'
-			);
-			checkoutCartContainer.innerHTML = '';
-
-			cartItems.forEach((item) => {
-				const itemElement = document.createElement('div');
-				itemElement.innerHTML = `
-                  <p>${item.name} - $${item.price.toFixed(2)}</p>
-                  <input type="number" value="${
-										item.quantity
-									}" min="1" data-product-id="${
-					item.productId
-				}" onchange="updateCartItemQuantity(this)">
-                  <button onclick="removeItemFromCart(${
-										item.productId
-									})">X</button>
-              `;
-				checkoutCartContainer.appendChild(itemElement);
-			});
-		})
-		.catch((error) => console.error('Error:', error));
-}
-
-function showCartUpdateMessage() {
-	const messageDiv = document.getElementById('cart-update-message');
-	messageDiv.style.display = 'block';
-
-	// Hide the message after 3 seconds
-	setTimeout(() => {
-		messageDiv.style.display = 'none';
-	}, 3000);
-}
-
-function updateCartItemQuantity(input) {
-	const productId = input.getAttribute('data-product-id');
-	const newQuantity = input.value;
-	fetch('/update-cart', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			productId: parseInt(productId, 10),
-			quantity: parseInt(newQuantity, 10),
-		}),
-	})
-		.then((response) => response.text())
-		.then((data) => {
-			console.log(data);
-			// message to confirm user of updated cart
-			showCartUpdateMessage();
-			updateCheckoutCart();
-		})
-		.catch((error) => console.error('Error:', error));
-}
-
-function removeItemFromCart(productId) {
-	fetch('/remove-from-cart', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ productId }),
-	})
-		.then((response) => response.text())
-		.then((data) => {
-			console.log(data);
-			// message to confirm user of updated cart
-			showCartUpdateMessage();
-			updateCheckoutCart();
-		})
-		.catch((error) => console.error('Error:', error));
-}
-function submitOrder() {
-	// Make a POST request to the server to place the order
-	fetch('/checkout', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		// No need to send body data as the server already has the cart in session
-	})
-		.then((response) => {
-			if (!response.ok) {
-				throw new Error('Problem placing order');
-			}
-			return response.text();
-		})
-		.then((confirmationMessage) => {
-			console.log(confirmationMessage);
-			window.location.href = '/confirmation'; // Redirect to the confirmation page
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-			alert('Error:', error);
 		});
 }

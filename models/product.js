@@ -24,11 +24,18 @@ module.exports = (sequelize, DataTypes) => {
 			},
 		},
 		{
-			// Additional model options
-			timestamps: false, // Disable automatic timestamp fields if not needed
-			tableName: 'products', // Specify the table name directly
+			timestamps: false,
+			tableName: 'products',
 		}
 	);
+
+	// Add associations here
+	Product.associate = (models) => {
+		Product.hasMany(models.TypePrice, {
+			foreignKey: 'product_id',
+			as: 'typePrices',
+		});
+	};
 
 	return Product;
 };

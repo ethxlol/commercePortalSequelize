@@ -1,0 +1,18 @@
+<%- include('partials/header', { title: 'Login' }) %>
+
+
+<body>
+<div class="login-container">
+    <h2>Logg deg inn for å bestille</h2>
+<form action="/login" method="POST" class="auth-form">
+    <input type="text" name="username" placeholder="Brukernavn" required />
+    <input type="password" name="password" placeholder="Passord" required />
+    <div class="auth-buttons">
+        <button type="submit">Logg inn</button>
+        
+    </div>
+</form>
+<!-- <script src="/javascripts/main.js"></script> -->
+
+</body>
+</html>
