@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
 		'TypePrice',
 		{
 			user_type: {
-				type: DataTypes.ENUM('retail', 'wholesale', 'bigclient'),
+				type: DataTypes.STRING(255),
 				allowNull: false,
 			},
 			product_id: {
