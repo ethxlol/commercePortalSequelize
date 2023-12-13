@@ -6,7 +6,7 @@ const session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
@@ -74,6 +74,7 @@ app.use('/checkout', checkoutRouter);
 // app.use('add-to-cart', cartRouter);
 app.use('/confirmation', confirmationRouter);
 app.use(cartRouter);
+app.use(registerRouter);
 
 // Route for user registration
 

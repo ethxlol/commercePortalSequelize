@@ -2,23 +2,21 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-let sequelize;
-if (config.use_env_variable) {
-	sequelize = new Sequelize(process.env[config.use_env_variable], {
-		dialect: 'mysql', // Specify your database dialect here (e.g., 'mysql', 'postgres', 'sqlite', etc.)
-		...config,
-	});
-} else {
-	sequelize = new Sequelize(config.database, config.username, config.password, {
-		dialect: 'mysql', // Specify your database dialect here
-		...config,
-	});
-}
+// Use environment variables to initialize Sequelize
+const sequelize = new Sequelize(
+	process.env.DB_NAME, // Use the .env variable for the database name
+	process.env.DB_USER, // Use the .env variable for the database username
+	process.env.DB_PASS, // Use the .env variable for the database password
+	{
+		host: process.env.DB_HOST, // Use the .env variable for the database host
+		dialect: 'mysql', // Assuming you're using MySQL
+		// Add any other Sequelize options here
+	}
+);
 
+// Read all the model files and initialize them
 fs.readdirSync(__dirname)
 	.filter((file) => {
 		return (
@@ -33,12 +31,14 @@ fs.readdirSync(__dirname)
 		db[model.name] = model;
 	});
 
+// Run .associate if it's defined on any of the models
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
 		db[modelName].associate(db);
 	}
 });
 
+// Add the sequelize instance and Sequelize class to the db object
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
