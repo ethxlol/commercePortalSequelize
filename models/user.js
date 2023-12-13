@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: DataTypes.NOW,
 			},
 			user_type: {
-				type: DataTypes.ENUM('retail', 'wholesale', 'bigclient'),
+				type: DataTypes.STRING(50),
 				defaultValue: 'retail',
 			},
 			delivery_address: {
