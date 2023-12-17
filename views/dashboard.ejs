@@ -1,0 +1,100 @@
+<%- include('partials/header', { title: 'Dashboard' }) %> <%-
+include('partials/navigation') %>
+<body>
+	<h1>Dashboard</h1>
+
+	<!-- Users Table -->
+	<h2>Users</h2>
+	<table>
+		<tr>
+			<th>Username</th>
+			<th>Email</th>
+			<!-- Add other user fields as needed -->
+		</tr>
+		<% users.forEach(user => { %>
+		<tr>
+			<td><%= user.username %></td>
+			<td><%= user.email %></td>
+			<!-- Add other user fields as needed -->
+		</tr>
+		<% }) %>
+	</table>
+	<button id="showAddUserFormButton">Add User</button>
+	<form id="addUserForm" style="display: none">
+		<div>
+			<label for="username">Username:</label>
+			<input type="text" id="username" name="username" required />
+		</div>
+		<div>
+			<label for="email">Email:</label>
+			<input type="email" id="email" name="email" required />
+		</div>
+		<div>
+			<label for="password">Password:</label>
+			<input type="password" id="password" name="password" required />
+		</div>
+		<div>
+			<label for="delivery_address">Delivery Address:</label>
+			<input
+				type="text"
+				id="delivery_address"
+				name="delivery_address"
+				required />
+		</div>
+		<button type="submit">Finish</button>
+		<button type="button" id="cancelAddUser">Cancel</button>
+	</form>
+
+	<!-- Products Table -->
+	<h2>Products</h2>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Price</th>
+			<!-- Add other product fields as needed -->
+		</tr>
+		<% products.forEach(product => { %>
+		<tr>
+			<td><%= product.name %></td>
+			<td><%= product.price %></td>
+			<!-- Add other product fields as needed -->
+		</tr>
+		<% }) %>
+	</table>
+	<button id="showAddProductFormButton">Add Product</button>
+	<form id="addProductForm" style="display: none">
+		<div>
+			<label for="productName">Product Name:</label>
+			<input type="text" id="productName" name="productName" required />
+		</div>
+		<div>
+			<label for="productDescription">Description:</label>
+			<textarea id="productDescription" name="productDescription"></textarea>
+		</div>
+		<div>
+			<label for="productPrice">Price:</label>
+			<input
+				type="number"
+				step="0.01"
+				id="productPrice"
+				name="productPrice"
+				required />
+		</div>
+		<div>
+			<label for="productQuantity">Quantity:</label>
+			<input
+				type="number"
+				id="productQuantity"
+				name="productQuantity"
+				required />
+		</div>
+		<div>
+			<label for="productImageUrl">Image URL:</label>
+			<input type="text" id="productImageUrl" name="productImageUrl" />
+		</div>
+
+		<button type="submit">Finish</button>
+		<button type="button" id="cancelAddProduct">Cancel</button>
+	</form>
+	<script src="/javascripts/dashboard.js"></script>
+</body>

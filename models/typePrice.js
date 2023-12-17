@@ -1,3 +1,5 @@
+console.log('seeder starting');
+
 module.exports = (sequelize, DataTypes) => {
 	const TypePrice = sequelize.define(
 		'TypePrice',

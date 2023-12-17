@@ -1,23 +1,19 @@
 console.log('Starting app.js');
+// Load environment variables from .env file
 require('dotenv').config();
+
+// Import required modules
 var createError = require('http-errors');
 var express = require('express');
 const session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-// const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-	service: 'gmail',
-	auth: {
-		user: process.env.EMAIL_USERNAME, // Email address for sending emails
-		pass: process.env.EMAIL_PASSWORD, // Password for sending emails
-	},
-});
+// Import Sequelize and database models
+const { sequelize } = require('./models');
 
-const { sequelize, User, Product, TypePrice } = require('./models');
+// Synchronize database models with the database
 sequelize
 	.sync()
 	.then(() => {
@@ -27,8 +23,10 @@ sequelize
 		console.error('Database connection error:', error);
 	});
 
+// Create an Express application
 var app = express();
 
+// Define a session secret key or use a default key
 const sessionSecretKey = process.env.SESSION_SECRET_KEY || 'default-secret-key';
 
 // Routes
@@ -42,9 +40,12 @@ var logoutRouter = require('./routes/logout');
 var cartRouter = require('./routes/cart');
 var checkoutRouter = require('./routes/checkout');
 var confirmationRouter = require('./routes/confirmation');
+var dashboardRouter = require('./routes/dashboard');
 
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configure Express to use sessions
 app.use(
 	session({
 		secret: sessionSecretKey,
@@ -53,15 +54,23 @@ app.use(
 	})
 );
 
-// view engine setup
+// Set up the view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Use the morgan logger for HTTP request logging
 app.use(logger('dev'));
+
+// Parse incoming JSON requests
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// Parse incoming URL-encoded requests
+app.use(express.urlencoded({ extended: true }));
+
+// Parse cookies
 app.use(cookieParser());
 
+// Use the defined routes
 app.use('/', indexRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
@@ -71,36 +80,25 @@ app.use('/products', productsRouter);
 app.use('/logout', logoutRouter);
 app.use('/cart', cartRouter);
 app.use('/checkout', checkoutRouter);
-// app.use('add-to-cart', cartRouter);
 app.use('/confirmation', confirmationRouter);
 app.use(cartRouter);
 app.use(registerRouter);
+app.use('/dashboard', dashboardRouter);
+app.use('/add-user', dashboardRouter);
+app.use('/add-product', dashboardRouter);
 
-// Route for user registration
-
-// Route for rendering the registration page
-
-// Route for rendering the login page
-
-// Route for getting the current user's username
-
-// Route for fetching products with dynamic pricing based on user type
-
-// Route for rendering the checkout page
-
-// Route for serving the order confirmation page
-
-// error handler
+// Error handling middleware
 app.use(function (err, req, res, next) {
-	// set locals, only providing error in development
+	// Set locals, only providing error in development
 	res.locals.message = err.message;
 	res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-	// render the error page
+	// Set the HTTP status code based on the error or default to 500 (Internal Server Error)
 	res.status(err.status || 500);
+
+	// Render the error page using the configured view engine (e.g., EJS)
 	res.render('error');
 });
 
-// Setting up the server to listen on a specified port
-
+// Export the Express application
 module.exports = app;
